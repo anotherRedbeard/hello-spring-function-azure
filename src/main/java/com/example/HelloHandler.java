@@ -8,18 +8,19 @@ import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.function.adapter.azure.AzureSpringBootRequestHandler;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-public class HelloHandler extends AzureSpringBootRequestHandler<User, Greeting> {
+@Component
+public class HelloHandler {
 
         //@Autowired
-        //private Function<String, String> uppercase;
-        
+        private Function<String, String> uppercase;
+
         //pulling in uppercase function from HelloFunction.java without using @Autowired
-        private final Function<String, String> uppercase = payload -> payload.toUpperCase();
+        //private final Function<String, String> uppercase = payload -> payload.toUpperCase();
         
         @FunctionName("hello")
         public HttpResponseMessage execute(
@@ -30,11 +31,18 @@ public class HelloHandler extends AzureSpringBootRequestHandler<User, Greeting> 
                         .orElseGet(() -> new User(
                                 request.getQueryParameters()
                                         .getOrDefault("name", "world")));
+
                 context.getLogger().info("Greeting user name: " + user.getName());
                 context.getLogger().info("UPPERCASED Greeting user name: " + uppercase.apply(user.getName()));
-                return request
+                /*return request
                         .createResponseBuilder(HttpStatus.OK)
                         .body(handleRequest(user, context))
+                        .header("Content-Type", "application/json")
+                        .build();*/
+
+                return request
+                        .createResponseBuilder(HttpStatus.OK)
+                        .body(new Greeting("Hello, " + this.uppercase.apply(user.getName()) + "!\n"))
                         .header("Content-Type", "application/json")
                         .build();
         }
