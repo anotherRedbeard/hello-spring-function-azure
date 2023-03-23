@@ -17,6 +17,6 @@ public class DemoApplication {
 	}
     
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(HelloFunction.class, args);
+        SpringApplication.run(DemoApplication.class, args);
     }
 }

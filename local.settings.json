@@ -1,8 +1,10 @@
 {
-  "IsEncrypted": false,
-  "Values": {
-    "AzureWebJobsStorage": "",
-    "FUNCTIONS_WORKER_RUNTIME": "java",
-    "MAIN_CLASS":"com.example.HelloFunction"
+    "IsEncrypted": false,
+    "Values": {
+      "AzureWebJobsStorage": "",
+      "FUNCTIONS_WORKER_RUNTIME": "java",
+      "MAIN_CLASS":"com.example.DemoApplication",
+      "SBConnectionString":"Endpoint=sb://java-sb-demo.servicebus.windows.net/;SharedAccessKeyName=SendListenPolicy;SharedAccessKey=D5qkXU4Plw4ppIkNNz4hyQxdDVjN2bZ4p+ASbDzR5do=;EntityPath=demo-queue"
+    }
   }
-}
+  

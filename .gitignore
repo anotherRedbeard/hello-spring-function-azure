@@ -34,3 +34,6 @@ hs_err_pid*
 bin/
 obj/
 /.gradle/
+
+#local settings
+local.settings.json

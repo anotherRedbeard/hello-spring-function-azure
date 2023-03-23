@@ -1,49 +1,42 @@
 package com.example;
 
-import com.example.model.Greeting;
-import com.example.model.User;
-import com.microsoft.azure.functions.*;
+import java.util.Optional;
+import java.util.function.Function;
+
+import com.microsoft.azure.functions.ExecutionContext;
+import com.microsoft.azure.functions.HttpMethod;
+import com.microsoft.azure.functions.HttpRequestMessage;
 import com.microsoft.azure.functions.annotation.AuthorizationLevel;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
+import com.microsoft.azure.functions.annotation.ServiceBusQueueTrigger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-import java.util.function.Function;
-
 @Component
 public class HelloHandler {
 
-        //@Autowired
+        @Autowired
         private Function<String, String> uppercase;
-
-        //pulling in uppercase function from HelloFunction.java without using @Autowired
-        //private final Function<String, String> uppercase = payload -> payload.toUpperCase();
         
         @FunctionName("hello")
-        public HttpResponseMessage execute(
-                @HttpTrigger(name = "request", methods = {HttpMethod.GET, HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS) HttpRequestMessage<Optional<User>> request,
+        public String execute(
+                @HttpTrigger(name = "request", methods = {HttpMethod.GET, HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS) HttpRequestMessage<Optional<String>> request,
                 ExecutionContext context) {
-                User user = request.getBody()
-                        .filter((u -> u.getName() != null))
-                        .orElseGet(() -> new User(
-                                request.getQueryParameters()
-                                        .getOrDefault("name", "world")));
 
-                context.getLogger().info("Greeting user name: " + user.getName());
-                context.getLogger().info("UPPERCASED Greeting user name: " + uppercase.apply(user.getName()));
-                /*return request
-                        .createResponseBuilder(HttpStatus.OK)
-                        .body(handleRequest(user, context))
-                        .header("Content-Type", "application/json")
-                        .build();*/
+                        //save result in variable
+                        String result = this.uppercase.apply(request.getBody().get());
+                        context.getLogger().info("here is the output:  " + result);
+                        return result;
+        }
 
-                return request
-                        .createResponseBuilder(HttpStatus.OK)
-                        .body(new Greeting("Hello, " + this.uppercase.apply(user.getName()) + "!\n"))
-                        .header("Content-Type", "application/json")
-                        .build();
+        @FunctionName("sbprocessor")
+        public void serviceBusProcess(
+                @ServiceBusQueueTrigger(name = "msg", queueName = "demo-queue", connection = "SBConnectionString") String message, 
+                final ExecutionContext context) {
+                
+                        String adjustedMessage = this.uppercase.apply(message);
+                        context.getLogger().info(adjustedMessage);
         }
 }
