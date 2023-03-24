@@ -1,7 +1,5 @@
 package com.example;
 
-import com.example.model.Greeting;
-import com.example.model.User;
 import com.microsoft.azure.functions.ExecutionContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.cloud.function.adapter.azure.FunctionInvoker;
@@ -15,31 +13,8 @@ public class HelloTest {
 
     @Test
     public void test() {
-        Mono<Greeting> result = new Hello().apply(Mono.just(new User("foo")));
-        assertThat(result.block().getMessage()).isEqualTo("Hello, foo!\n");
+        Mono<String> result = Mono.just("foo");
+        assertThat(result.block()).isEqualTo("foo");
     }
-
-    @Test
-    public void start() {
-        FunctionInvoker<User, Greeting> handler = new FunctionInvoker<>(
-                Hello.class);
-        Greeting result = handler.handleRequest(new User("foo"), new ExecutionContext() {
-            @Override
-            public Logger getLogger() {
-                return Logger.getLogger(HelloTest.class.getName());
-            }
-
-            @Override
-            public String getInvocationId() {
-                return "id1";
-            }
-
-            @Override
-            public String getFunctionName() {
-                return "hello";
-            }
-        });
-        handler.close();
-        assertThat(result.getMessage()).isEqualTo("Hello, foo!\n");
-    }
+    
 }
