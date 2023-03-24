@@ -2,6 +2,7 @@ package com.example;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.HttpMethod;
@@ -10,6 +11,8 @@ import com.microsoft.azure.functions.annotation.AuthorizationLevel;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
 import com.microsoft.azure.functions.annotation.ServiceBusQueueTrigger;
+
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,18 +28,20 @@ public class HelloHandler {
                 @HttpTrigger(name = "request", methods = {HttpMethod.GET, HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS) HttpRequestMessage<Optional<String>> request,
                 ExecutionContext context) {
 
+                        Logger logger = context.getLogger();
                         //save result in variable
                         String result = this.uppercase.apply(request.getBody().get());
-                        context.getLogger().info("here is the output:  " + result);
+                        logger.info("here is the output:  " + result);
                         return result;
         }
 
         @FunctionName("sbprocessor")
         public void serviceBusProcess(
                 @ServiceBusQueueTrigger(name = "msg", queueName = "demo-queue", connection = "SBConnectionString") String message, 
-                final ExecutionContext context) {
-                
-                        String adjustedMessage = this.uppercase.apply(message);
-                        context.getLogger().info(adjustedMessage);
+            final ExecutionContext context) {
+
+                Logger logger = context.getLogger();
+                String adjustedMessage = this.uppercase.apply(message);
+                logger.info(adjustedMessage);
         }
 }

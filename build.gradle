@@ -5,7 +5,7 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
+    mavenCentral()
     maven {
         url = 'https://repo.spring.io/libs-snapshot-local'
     }
@@ -38,6 +38,15 @@ sourceCompatibility = '1.17'
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
+
+task dependencyVersions {
+    doLast {
+        configurations.compileClasspath.allDependencies.each { dep ->
+            println "${dep.name} version: ${dep.version}"
+        }
+    }
+}
+
 
 jar {
     manifest {
