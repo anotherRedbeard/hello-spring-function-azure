@@ -4,6 +4,7 @@ import com.microsoft.azure.functions.*;
 import com.microsoft.azure.functions.annotation.AuthorizationLevel;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
+import com.microsoft.azure.functions.annotation.ServiceBusQueueTrigger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,4 +30,14 @@ public class HelloHandler {
                 logger.info("here is the output:  " + result);
                 return result;
     }
+
+    @FunctionName("sbprocessor")
+        public void serviceBusProcess(
+                @ServiceBusQueueTrigger(name = "msg", queueName = "demo-queue", connection = "SBConnectionString") String message, 
+            final ExecutionContext context) {
+
+                Logger logger = context.getLogger();
+                String adjustedMessage = this.uppercase.apply(message);
+                logger.info(adjustedMessage);
+        }
 }
