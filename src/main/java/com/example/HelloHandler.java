@@ -1,10 +1,9 @@
 package com.example;
 
+import com.azure.messaging.servicebus.ServiceBusMessage;
+import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.microsoft.azure.functions.*;
-import com.microsoft.azure.functions.annotation.AuthorizationLevel;
-import com.microsoft.azure.functions.annotation.FunctionName;
-import com.microsoft.azure.functions.annotation.HttpTrigger;
-import com.microsoft.azure.functions.annotation.ServiceBusQueueTrigger;
+import com.microsoft.azure.functions.annotation.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,12 +31,20 @@ public class HelloHandler {
     }
 
     @FunctionName("sbprocessor")
-        public void serviceBusProcess(
-                @ServiceBusQueueTrigger(name = "msg", queueName = "demo-queue", connection = "SBConnectionString") String message, 
-            final ExecutionContext context) {
+    public void serviceBusProcess(
+            @ServiceBusQueueTrigger(name = "msg", queueName = "demo-queue", connection = "SBConnectionString") String message,
+            final ExecutionContext context,
+            @BindingName("DeliveryCount") long deliveryCount,
+            @BindingName("MessageId") String messageId) {
 
                 Logger logger = context.getLogger();
-                String adjustedMessage = this.uppercase.apply(message);
-                logger.info(adjustedMessage);
+                logger.info("Delivery count: " + deliveryCount);
+                logger.info("Message body: " + this.uppercase.apply(message));
+                logger.info("Message id: " + messageId);
+
+                if (message.equals("throw exception") && deliveryCount <= 3)
+                {
+                        throw new RuntimeException("Error processing message");
+                }
         }
 }
