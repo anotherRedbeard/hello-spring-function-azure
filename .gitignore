@@ -30,10 +30,11 @@ hs_err_pid*
 .DS_Store
 
 # Azure Functions
-# local.settings.json
 bin/
 obj/
 /.gradle/
+/.mvn/
+build/
 
 #local settings
 local.settings.json
